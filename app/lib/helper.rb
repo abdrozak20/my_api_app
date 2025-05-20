@@ -7,7 +7,7 @@ class Helper
         product_code
     end
 
-    def self.generate_payload_create_product(product_code, category_code, product_name, size, unit, stock, description, purchase_price, created_by)
+    def self.generate_payload_create_product(product_code, category_code, product_name, size, unit, stock, description, purchase_price, created_by, image_path)
         {
             code: product_code,
             name: product_name,
@@ -17,6 +17,7 @@ class Helper
             unit: unit,
             description: description,
             purchase_price: purchase_price,
+            image_path: image_path,
             created_by: created_by
         }
     end
