@@ -1,3 +1,6 @@
+require 'base64'
+require 'securerandom'
+
 class ProductsController < ApplicationController
   # GET /products
   def index
@@ -42,16 +45,21 @@ class ProductsController < ApplicationController
     begin
       required_keys = [:name, :category_code, :size, :unit]
       validated_params = product_params(required_keys)
-    
+      
       product_name = params[:name]
       category_code = params[:category_code]
       size = params[:size]
       stock = 0
       unit = params[:unit]
       description = params[:description]
+      image = params[:image]
+
+      if image.present?
+        image_path = save_image(image)
+      end
+      
       purchase_price = 0
       product_code = Helper.generate_product_code(product_name, category_code, size)
-      image_path = nil
       
       payload = Helper.generate_payload_create_product(product_code, category_code, product_name, size, unit, stock, description, purchase_price, @current_user.username, image_path)
       product = ProductRepository.create(payload)
@@ -69,6 +77,28 @@ class ProductsController < ApplicationController
         message: e.message
       }, status: :internal_server_error
     end
+  end
+
+  def save_image(image)
+    if image =~ /^data:(.*?);base64,(.*)$/
+      mime_type = Regexp.last_match(1)
+      data = Base64.decode64(Regexp.last_match(2))
+      ext = image_extension(mime_type)
+      filename = "#{SecureRandom.uuid}.#{ext}"
+      file_path = Rails.root.join('public', 'products', filename)
+      File.open(file_path, 'wb') { |f| f.write(data) }
+      "products/#{filename}" # ini yang disimpan di database
+    else
+      raise "Invalid Base64"
+    end
+  end
+  
+  def image_extension(mime)
+    {
+      'image/jpeg' => 'jpg',
+      'image/png' => 'png',
+      'image/gif' => 'gif'
+    }[mime] || 'png'
   end
 
   # PATCH/PUT /products/1

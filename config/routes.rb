@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     post '/signup', to: 'auth#signup'
     post '/refresh', to: 'auth#refresh'
     get '/category', to: 'categories#get_all'
+    post '/transaction', to: 'transactions#store'
     resources :products
     
     get "up" => "rails/health#show", as: :rails_health_check

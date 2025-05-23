@@ -4,7 +4,7 @@ class ProductRepository
     end
 
     def self.update(id, payload)
-        Product.update(id, payload)
+        Product.update!(id, payload)
     end
 
     def self.get_all
@@ -13,6 +13,10 @@ class ProductRepository
 
     def self.find_by_id(id)
         Product.find(id)
+    end
+
+    def self.find_by_code(code)
+        Product.find_by(code: code)
     end
 
     def self.datatable(params)
